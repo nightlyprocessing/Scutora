@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<feedback>
+  <report_metadata>
+    <org_name>ExampleReceiver</org_name>
+    <email>noreply@example.com</email>
+    <report_id>12345</report_id>
+    <date_range>
+      <begin>1709251200</begin>
+      <end>1709337600</end>
+    </date_range>
+  </report_metadata>
+
+  <policy_published>
+    <domain>example.com</domain>
+    <p>none</p>
+    <sp>none</sp>
+    <adkim>r</adkim>
+    <aspf>r</aspf>
+  </policy_published>
+
+  <record>
+    <row>
+      <source_ip>192.0.2.10</source_ip>
+      <count>145</count>
+      <policy_evaluated>
+        <dkim>pass</dkim>
+        <spf>pass</spf>
+      </policy_evaluated>
+    </row>
+  </record>
+
+  <record>
+    <row>
+      <source_ip>198.51.100.5</source_ip>
+      <count>23</count>
+      <policy_evaluated>
+        <dkim>fail</dkim>
+        <spf>pass</spf>
+      </policy_evaluated>
+    </row>
+  </record>
+</feedback>
