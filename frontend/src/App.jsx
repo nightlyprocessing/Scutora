@@ -24,17 +24,17 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const analyzeEndpoint = useMemo(() => {
-    return `http://localhost:7071/api/analyze?domain=${encodeURIComponent(
-      domain || "scutora.com"
-    )}`;
-  }, [domain]);
+const analyzeEndpoint = useMemo(() => {
+  return `/api/analyze?domain=${encodeURIComponent(
+    domain || "scutora.com"
+  )}`;
+}, [domain]);
 
-  const uploadEndpoint = useMemo(() => {
-    return `http://localhost:7071/api/analyze-upload?domain=${encodeURIComponent(
-      domain || "scutora.com"
-    )}`;
-  }, [domain]);
+const uploadEndpoint = useMemo(() => {
+  return `/api/analyze-upload?domain=${encodeURIComponent(
+    domain || "scutora.com"
+  )}`;
+}, [domain]);
 
   async function runAnalysis() {
     setLoading(true);
