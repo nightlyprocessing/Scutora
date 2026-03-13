@@ -24,24 +24,23 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-const analyzeEndpoint = useMemo(() => {
-  return `/api/analyze?domain=${encodeURIComponent(
-    domain || "scutora.com"
-  )}`;
-}, [domain]);
+  const analyzeEndpoint = useMemo(() => {
+    return `/api/analyze?domain=${encodeURIComponent(domain || "scutora.com")}`;
+  }, [domain]);
 
-const uploadEndpoint = useMemo(() => {
-  return `/api/analyze-upload?domain=${encodeURIComponent(
-    domain || "scutora.com"
-  )}`;
-}, [domain]);
+  const uploadEndpoint = useMemo(() => {
+    return `/api/analyze-upload?domain=${encodeURIComponent(domain || "scutora.com")}`;
+  }, [domain]);
 
   async function runAnalysis() {
     setLoading(true);
     setError("");
 
     try {
-      const response = await fetch(analyzeEndpoint);
+      const response = await fetch(analyzeEndpoint, {
+        method: "GET",
+      });
+
       if (!response.ok) {
         throw new Error(`Request failed with status ${response.status}`);
       }
@@ -66,14 +65,9 @@ const uploadEndpoint = useMemo(() => {
     setError("");
 
     try {
-      const fileText = await selectedFile.text();
-
       const response = await fetch(uploadEndpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/xml"
-        },
-        body: fileText
+        body: selectedFile,
       });
 
       if (!response.ok) {
@@ -138,7 +132,7 @@ const uploadEndpoint = useMemo(() => {
               placeholder="scutora.com"
             />
 
-            <button onClick={runAnalysis} disabled={loading}>
+            <button type="button" onClick={runAnalysis} disabled={loading}>
               {loading ? "Analyzing..." : "Analyze Domain"}
             </button>
 
@@ -150,7 +144,7 @@ const uploadEndpoint = useMemo(() => {
                 accept=".xml,text/xml,application/xml"
                 onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
               />
-              <button onClick={runUploadAnalysis} disabled={loading}>
+              <button type="button" onClick={runUploadAnalysis} disabled={loading}>
                 {loading ? "Uploading..." : "Analyze Uploaded Report"}
               </button>
             </div>
@@ -230,31 +224,45 @@ const uploadEndpoint = useMemo(() => {
                 <div className="pill-grid wide">
                   <div className="card">
                     <div className="pill-label">Total Messages</div>
-                    <div className="pill-value">{String(result.summary?.total_messages ?? "N/A")}</div>
+                    <div className="pill-value">
+                      {String(result.summary?.total_messages ?? "N/A")}
+                    </div>
                   </div>
                   <div className="card">
                     <div className="pill-label">DKIM Pass Count</div>
-                    <div className="pill-value">{String(result.summary?.dkim_pass_count ?? "N/A")}</div>
+                    <div className="pill-value">
+                      {String(result.summary?.dkim_pass_count ?? "N/A")}
+                    </div>
                   </div>
                   <div className="card">
                     <div className="pill-label">SPF Pass Count</div>
-                    <div className="pill-value">{String(result.summary?.spf_pass_count ?? "N/A")}</div>
+                    <div className="pill-value">
+                      {String(result.summary?.spf_pass_count ?? "N/A")}
+                    </div>
                   </div>
                   <div className="card">
                     <div className="pill-label">DKIM Pass Rate</div>
-                    <div className="pill-value">{String(result.summary?.dkim_pass_rate ?? "N/A")}%</div>
+                    <div className="pill-value">
+                      {String(result.summary?.dkim_pass_rate ?? "N/A")}%
+                    </div>
                   </div>
                   <div className="card">
                     <div className="pill-label">SPF Pass Rate</div>
-                    <div className="pill-value">{String(result.summary?.spf_pass_rate ?? "N/A")}%</div>
+                    <div className="pill-value">
+                      {String(result.summary?.spf_pass_rate ?? "N/A")}%
+                    </div>
                   </div>
                   <div className="card">
                     <div className="pill-label">Failing Senders</div>
-                    <div className="pill-value">{String(result.diagnostics?.failing_sender_count ?? "N/A")}</div>
+                    <div className="pill-value">
+                      {String(result.diagnostics?.failing_sender_count ?? "N/A")}
+                    </div>
                   </div>
                   <div className="card">
                     <div className="pill-label">Suspicious Senders</div>
-                    <div className="pill-value">{String(result.diagnostics?.suspicious_sender_count ?? "N/A")}</div>
+                    <div className="pill-value">
+                      {String(result.diagnostics?.suspicious_sender_count ?? "N/A")}
+                    </div>
                   </div>
                 </div>
               </div>
