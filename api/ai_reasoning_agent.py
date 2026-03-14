@@ -19,7 +19,6 @@ def generate_reasoning(summary, diagnostics, decision):
     deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
     api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
 
-    # Check for missing configuration
     missing = []
     if not endpoint:
         missing.append("AZURE_OPENAI_ENDPOINT")
@@ -30,7 +29,11 @@ def generate_reasoning(summary, diagnostics, decision):
 
     if missing:
         raise ValueError(
-            f"Missing Azure OpenAI environment variables: {', '.join(missing)}"
+            f"Missing Azure OpenAI environment variables: {', '.join(missing)} | "
+            f"endpoint_present={bool(endpoint)} | "
+            f"api_key_present={bool(api_key)} | "
+            f"deployment_present={bool(deployment)} | "
+            f"deployment_value={repr(deployment)}"
         )
 
     client = AzureOpenAI(
