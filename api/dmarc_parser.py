@@ -12,10 +12,31 @@
 import xml.etree.ElementTree as ET
 
 
+def extract_domain_from_report(root):
+    """
+    Try to determine the DMARC report's target domain.
+
+    Preference order:
+    1. policy_published/domain
+    2. identifiers/header_from (first record)
+    """
+
+    policy_domain = root.findtext(".//policy_published/domain")
+    if policy_domain:
+        return policy_domain.strip()
+
+    header_from = root.findtext(".//record/identifiers/header_from")
+    if header_from:
+        return header_from.strip()
+
+    return None
+
+
 def parse_dmarc_report(xml_file):
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
+    report_domain = extract_domain_from_report(root)
     results = []
 
     for record in root.findall(".//record"):
@@ -31,7 +52,10 @@ def parse_dmarc_report(xml_file):
             "spf": spf
         })
 
-    return results
+    return {
+        "domain": report_domain,
+        "results": results
+    }
 
 
 def summarize_results(results):
@@ -58,11 +82,13 @@ def summarize_results(results):
 
 
 if __name__ == "__main__":
-    report = parse_dmarc_report("sample_dmarc.xml")
+    parsed = parse_dmarc_report("sample_dmarc.xml")
+    report = parsed["results"]
     summary = summarize_results(report)
 
     print("DMARC Summary")
     print("-------------")
+    print(f"Domain: {parsed['domain']}")
     print(f"Total messages: {summary['total_messages']}")
     print(f"DKIM pass count: {summary['dkim_pass_count']}")
     print(f"SPF pass count: {summary['spf_pass_count']}")
