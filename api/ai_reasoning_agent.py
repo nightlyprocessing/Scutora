@@ -16,7 +16,11 @@ from openai import AzureOpenAI
 def generate_reasoning(summary, diagnostics, decision):
     endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     api_key = os.getenv("AZURE_OPENAI_API_KEY")
-    deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+    deployment = (
+        os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+        or os.getenv("AZURE_OPENAI_DEPLOYMENT")
+        or "gpt-4o-mini"
+    )
     api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
 
     missing = []
@@ -24,8 +28,6 @@ def generate_reasoning(summary, diagnostics, decision):
         missing.append("AZURE_OPENAI_ENDPOINT")
     if not api_key:
         missing.append("AZURE_OPENAI_API_KEY")
-    if not deployment:
-        missing.append("AZURE_OPENAI_DEPLOYMENT_NAME")
 
     if missing:
         raise ValueError(
