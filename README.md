@@ -3,7 +3,7 @@ Agent-based email authentication governance prototype
 
 Scutora is an experimental multi-agent platform designed to observe domain authentication telemetry and recommend staged enforcement of SPF, DKIM, and DMARC policies.
 
-This project is being developed as part of the Microsoft AI Dev Days Hackathon.
+This project is being developed as part of the 2026 Microsoft AI Dev Days Hackathon.
 
 ## Concept
 
