@@ -16,11 +16,15 @@ from openai import AzureOpenAI
 def generate_reasoning(summary, diagnostics, decision):
     endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     api_key = os.getenv("AZURE_OPENAI_API_KEY")
-    deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+    deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+    api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
+
+    if not endpoint or not api_key or not deployment:
+        raise ValueError("Azure OpenAI environment variables are not configured correctly.")
 
     client = AzureOpenAI(
         api_key=api_key,
-        api_version="2024-02-01",
+        api_version=api_version,
         azure_endpoint=endpoint
     )
 
