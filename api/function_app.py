@@ -17,6 +17,9 @@ from orchestrator import run_scutora_analysis
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
+@app.route(route="ping", methods=["GET"])
+def ping(req: func.HttpRequest) -> func.HttpResponse:
+    return func.HttpResponse("pong", status_code=200)
 
 @app.route(route="analyze")
 def analyze(req: func.HttpRequest) -> func.HttpResponse:
