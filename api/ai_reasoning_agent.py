@@ -16,11 +16,7 @@ from openai import AzureOpenAI
 def generate_reasoning(summary, diagnostics, decision):
     endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     api_key = os.getenv("AZURE_OPENAI_API_KEY")
-    deployment = (
-        os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
-        or os.getenv("AZURE_OPENAI_DEPLOYMENT")
-        or "gpt-4o-mini"
-    )
+    deployment = "scutora-reasoner"
     api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-02-15-preview")
 
     missing = []
@@ -34,7 +30,6 @@ def generate_reasoning(summary, diagnostics, decision):
             f"Missing Azure OpenAI environment variables: {', '.join(missing)} | "
             f"endpoint_present={bool(endpoint)} | "
             f"api_key_present={bool(api_key)} | "
-            f"deployment_present={bool(deployment)} | "
             f"deployment_value={repr(deployment)}"
         )
 
