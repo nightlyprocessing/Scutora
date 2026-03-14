@@ -14,21 +14,16 @@
     automation developed as part of the Scutora platform.
 */
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 
 export default function App() {
-  const [domain, setDomain] = useState("nightlyprocessing.com");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const uploadEndpoint = useMemo(() => {
-    return `/api/analyze-upload?domain=${encodeURIComponent(
-      domain || "nightlyprocessing.com"
-    )}`;
-  }, [domain]);
+  const uploadEndpoint = "/api/analyze-upload";
 
   async function runUploadAnalysis() {
     if (!selectedFile) {
@@ -54,7 +49,7 @@ export default function App() {
             errorMessage = errorData.error;
           }
         } catch {
-          // Ignore JSON parse issues and fall back to the generic message.
+          // Ignore JSON parsing issues and use generic message.
         }
 
         throw new Error(errorMessage);
@@ -89,7 +84,17 @@ export default function App() {
   }
 
   function buildActionSteps(actionPlan) {
-    const steps = [];
+    const nextSteps = actionPlan?.next_steps || [];
+
+    if (nextSteps.length > 0) {
+      return nextSteps.map((step) => ({
+        title: step.title || "Recommended Step",
+        description: step.description || "No description provided.",
+        reason: step.reason || "No reason provided.",
+      }));
+    }
+
+    const fallbackSteps = [];
     const actions = actionPlan?.proposed_actions || [];
 
     actions.forEach((action) => {
@@ -99,34 +104,14 @@ export default function App() {
       const proposedValue = action.proposed_value || "unknown";
       const reason = action.reason || "No reason provided.";
 
-      steps.push({
+      fallbackSteps.push({
         title: `Update ${recordType} ${recordName}`,
         description: `Change the value from "${currentValue}" to "${proposedValue}".`,
         reason,
       });
     });
 
-    if (actions.length > 0) {
-      steps.push({
-        title: "Validate mail flow after the change",
-        description:
-          "Monitor aggregate reports and confirm legitimate sending sources continue to authenticate successfully after the DNS update is published.",
-        reason:
-          "Authentication policy changes should be introduced carefully to avoid disrupting valid email traffic.",
-      });
-
-      if (actionPlan?.approval_required) {
-        steps.push({
-          title: "Obtain approval before implementation",
-          description:
-            "Have the recommended governance change reviewed and approved before applying it in production.",
-          reason:
-            "Email authentication policy changes can affect business-critical mail flow and should require human review.",
-        });
-      }
-    }
-
-    return steps;
+    return fallbackSteps;
   }
 
   const riskClass = getRiskClass(result?.decision?.risk_level);
@@ -137,7 +122,7 @@ export default function App() {
     <div className="page">
       <div className="container">
         <div className="hero">
-          <div>
+          <div className="hero-content">
             <div className="badge">Scutora</div>
             <h1>Email Authentication Governance Dashboard</h1>
             <p className="hero-copy">
@@ -358,13 +343,11 @@ export default function App() {
                     ) : (
                       <div className="action-steps">
                         {actionSteps.map((step, index) => (
-                          <div key={index} className="card" style={{ marginBottom: "1rem" }}>
-                            <div className="pill-label">Step {index + 1}</div>
-                            <div className="pill-value" style={{ marginBottom: ".5rem" }}>
-                              {step.title}
-                            </div>
-                            <div>{step.description}</div>
-                            <div style={{ marginTop: ".5rem", opacity: 0.85 }}>
+                          <div key={index} className="card action-step-card">
+                            <div className="step-number">Step {index + 1}</div>
+                            <div className="action-step-title">{step.title}</div>
+                            <div className="action-step-description">{step.description}</div>
+                            <div className="action-step-reason">
                               <strong>Why:</strong> {step.reason}
                             </div>
                           </div>
@@ -373,14 +356,16 @@ export default function App() {
                     )}
 
                     {result.action_plan?.proposed_actions?.length ? (
-                      <div className="section-card" style={{ marginTop: "1rem" }}>
+                      <div className="section-card nested-card">
                         <div className="section-header">
                           <h2>Technical Change Details</h2>
                           <p>Structured implementation details for the recommended DNS change.</p>
                         </div>
                         <div className="section-body">
                           {result.action_plan.proposed_actions.map((action, index) => (
-                            <div key={index} className="card" style={{ marginBottom: "1rem" }}>
+                            <div key={index} className="card technical-detail-card">
+                              <div><strong>System:</strong> {action.system || "N/A"}</div>
+                              <div><strong>Action:</strong> {action.action || "N/A"}</div>
                               <div><strong>Record Type:</strong> {action.record_type || "N/A"}</div>
                               <div><strong>Record Name:</strong> {action.record_name || "N/A"}</div>
                               <div><strong>Current Value:</strong> {action.current_value || "N/A"}</div>
