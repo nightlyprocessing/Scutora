@@ -18,42 +18,17 @@ import { useMemo, useState } from "react";
 import "./App.css";
 
 export default function App() {
-  const [domain, setDomain] = useState("scutora.com");
+  const [domain, setDomain] = useState("nightlyprocessing.com");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const analyzeEndpoint = useMemo(() => {
-    return `/api/analyze?domain=${encodeURIComponent(domain || "scutora.com")}`;
-  }, [domain]);
-
   const uploadEndpoint = useMemo(() => {
-    return `/api/analyze-upload?domain=${encodeURIComponent(domain || "scutora.com")}`;
+    return `/api/analyze-upload?domain=${encodeURIComponent(
+      domain || "nightlyprocessing.com"
+    )}`;
   }, [domain]);
-
-  async function runAnalysis() {
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch(analyzeEndpoint, {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-
-      const data = await response.json();
-      setResult(data);
-    } catch (err) {
-      setError(err?.message || "Failed to call Scutora backend.");
-      setResult(null);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function runUploadAnalysis() {
     if (!selectedFile) {
@@ -71,7 +46,18 @@ export default function App() {
       });
 
       if (!response.ok) {
-        throw new Error(`Upload request failed with status ${response.status}`);
+        let errorMessage = `Upload request failed with status ${response.status}`;
+
+        try {
+          const errorData = await response.json();
+          if (errorData?.error) {
+            errorMessage = errorData.error;
+          }
+        } catch {
+          // Ignore JSON parse issues and fall back to the generic message.
+        }
+
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -102,40 +88,66 @@ export default function App() {
     return "class-unknown";
   }
 
+  function buildActionSteps(actionPlan) {
+    const steps = [];
+    const actions = actionPlan?.proposed_actions || [];
+
+    actions.forEach((action) => {
+      const recordType = action.record_type || "record";
+      const recordName = action.record_name || "DNS record";
+      const currentValue = action.current_value || "unknown";
+      const proposedValue = action.proposed_value || "unknown";
+      const reason = action.reason || "No reason provided.";
+
+      steps.push({
+        title: `Update ${recordType} ${recordName}`,
+        description: `Change the value from "${currentValue}" to "${proposedValue}".`,
+        reason,
+      });
+    });
+
+    if (actions.length > 0) {
+      steps.push({
+        title: "Validate mail flow after the change",
+        description:
+          "Monitor aggregate reports and confirm legitimate sending sources continue to authenticate successfully after the DNS update is published.",
+        reason:
+          "Authentication policy changes should be introduced carefully to avoid disrupting valid email traffic.",
+      });
+
+      if (actionPlan?.approval_required) {
+        steps.push({
+          title: "Obtain approval before implementation",
+          description:
+            "Have the recommended governance change reviewed and approved before applying it in production.",
+          reason:
+            "Email authentication policy changes can affect business-critical mail flow and should require human review.",
+        });
+      }
+    }
+
+    return steps;
+  }
+
   const riskClass = getRiskClass(result?.decision?.risk_level);
   const classifiedFindings = result?.diagnostics?.classified_findings || [];
+  const actionSteps = buildActionSteps(result?.action_plan);
 
   return (
     <div className="page">
       <div className="container">
-        <div className="demo-banner">
-          Demo Mode: Scutora analyzes DMARC telemetry and proposes safe authentication policy changes.
-        </div>
-
         <div className="hero">
           <div>
             <div className="badge">Scutora</div>
             <h1>Email Authentication Governance Dashboard</h1>
             <p className="hero-copy">
-              Multi-step analysis for DMARC telemetry, posture discovery,
-              diagnostics, policy recommendation, reasoning, and action
-              planning.
+              Upload a DMARC aggregate XML report to evaluate authentication posture,
+              identify suspicious sender behavior, and generate governance
+              recommendations with AI-assisted reasoning.
             </p>
           </div>
 
           <div className="control-card">
-            <label htmlFor="domain">Domain</label>
-            <input
-              id="domain"
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-              placeholder="scutora.com"
-            />
-
-            <button type="button" onClick={runAnalysis} disabled={loading}>
-              {loading ? "Analyzing..." : "Analyze Domain"}
-            </button>
-
             <div className="upload-block">
               <label htmlFor="xmlfile">DMARC XML Upload</label>
               <input
@@ -150,9 +162,6 @@ export default function App() {
             </div>
 
             {loading ? <div className="loading">Running Scutora analysis...</div> : null}
-
-            <p className="endpoint">{analyzeEndpoint}</p>
-            <p className="endpoint">{uploadEndpoint}</p>
           </div>
         </div>
 
@@ -172,8 +181,8 @@ export default function App() {
 
         {!result && !loading ? (
           <div className="empty-state">
-            Enter a domain and either click <strong>Analyze Domain</strong> or
-            upload a DMARC XML report.
+            Upload a DMARC XML report to generate telemetry findings, risk analysis,
+            AI reasoning, and recommended governance actions.
           </div>
         ) : null}
 
@@ -330,12 +339,60 @@ export default function App() {
             <div className="section-card">
               <div className="section-header">
                 <h2>Action Plan</h2>
-                <p>Proposed next steps requiring human approval.</p>
+                <p>Concrete next steps based on the current findings.</p>
               </div>
               <div className="section-body">
-                <pre className="code-block">
-                  {JSON.stringify(result.action_plan, null, 2)}
-                </pre>
+                {!result?.action_plan ? (
+                  <div className="empty-inline">No action plan available.</div>
+                ) : (
+                  <>
+                    <div className="card" style={{ marginBottom: "1rem" }}>
+                      <div className="pill-label">Approval Required</div>
+                      <div className="pill-value">
+                        {String(result.action_plan?.approval_required ?? "N/A")}
+                      </div>
+                    </div>
+
+                    {actionSteps.length === 0 ? (
+                      <div className="empty-inline">No concrete action steps available.</div>
+                    ) : (
+                      <div className="action-steps">
+                        {actionSteps.map((step, index) => (
+                          <div key={index} className="card" style={{ marginBottom: "1rem" }}>
+                            <div className="pill-label">Step {index + 1}</div>
+                            <div className="pill-value" style={{ marginBottom: ".5rem" }}>
+                              {step.title}
+                            </div>
+                            <div>{step.description}</div>
+                            <div style={{ marginTop: ".5rem", opacity: 0.85 }}>
+                              <strong>Why:</strong> {step.reason}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {result.action_plan?.proposed_actions?.length ? (
+                      <div className="section-card" style={{ marginTop: "1rem" }}>
+                        <div className="section-header">
+                          <h2>Technical Change Details</h2>
+                          <p>Structured implementation details for the recommended DNS change.</p>
+                        </div>
+                        <div className="section-body">
+                          {result.action_plan.proposed_actions.map((action, index) => (
+                            <div key={index} className="card" style={{ marginBottom: "1rem" }}>
+                              <div><strong>Record Type:</strong> {action.record_type || "N/A"}</div>
+                              <div><strong>Record Name:</strong> {action.record_name || "N/A"}</div>
+                              <div><strong>Current Value:</strong> {action.current_value || "N/A"}</div>
+                              <div><strong>Proposed Value:</strong> {action.proposed_value || "N/A"}</div>
+                              <div><strong>Reason:</strong> {action.reason || "N/A"}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
+                )}
               </div>
             </div>
           </div>
