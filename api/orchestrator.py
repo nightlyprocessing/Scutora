@@ -43,25 +43,30 @@ def run_scutora_analysis(
 
     gandi_api_token = os.getenv("GANDI_API_TOKEN")
 
+    parsed_report = parse_dmarc_report(xml_file)
+    extracted_domain = parsed_report.get("domain")
+    results = parsed_report.get("results", [])
+
+    effective_domain = extracted_domain or domain
+
     m365_posture = discover_m365_posture(
-        domain=domain,
+        domain=effective_domain,
         use_mock=use_mock_m365
     )
 
     gandi_posture = discover_gandi_posture(
-        domain=domain,
+        domain=effective_domain,
         api_token=gandi_api_token,
         use_mock=use_mock_gandi
     )
 
-    results = parse_dmarc_report(xml_file)
     summary = summarize_results(results)
     diagnostics = analyze_sender_issues(results)
     decision = evaluate_enforcement_readiness(summary)
     reasoning = generate_reasoning(summary, diagnostics, decision)
 
     action_plan = build_action_plan(
-        domain=domain,
+        domain=effective_domain,
         m365_posture=m365_posture,
         gandi_posture=gandi_posture,
         summary=summary,
@@ -70,9 +75,10 @@ def run_scutora_analysis(
     )
 
     return {
-        "domain": domain,
+        "domain": effective_domain,
         "telemetry_source": {
-            "xml_file": xml_file
+            "xml_file": xml_file,
+            "report_domain": extracted_domain
         },
         "m365_posture": m365_posture,
         "gandi_posture": gandi_posture,
