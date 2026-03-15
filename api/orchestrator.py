@@ -62,7 +62,7 @@ def run_scutora_analysis(
 
     summary = summarize_results(results)
     diagnostics = analyze_sender_issues(results)
-    decision = evaluate_enforcement_readiness(summary)
+    decision = evaluate_enforcement_readiness(summary, diagnostics)
     reasoning = generate_reasoning(summary, diagnostics, decision)
 
     action_plan = build_action_plan(
