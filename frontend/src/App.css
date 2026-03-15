@@ -715,3 +715,63 @@ td {
     display: none;
   }
 }
+
+/* ------------------------------------------------ */
+/* PDF EXPORT SUPPORT */
+/* ------------------------------------------------ */
+
+.no-pdf {
+  display: block;
+}
+
+.pdf-export-surface {
+  padding-top: 0;
+}
+
+.pdf-report-header {
+  margin-bottom: 20px;
+  padding: 22px 24px;
+  border: 1px solid rgba(192, 132, 252, 0.2);
+  background: linear-gradient(180deg, rgba(18, 10, 42, 0.94) 0%, rgba(12, 8, 30, 0.96) 100%);
+  border-radius: 18px;
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.pdf-report-brand {
+  display: inline-block;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d8b4fe;
+}
+
+.pdf-report-header h1 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  line-height: 1.2;
+  color: #f8f0ff;
+  text-shadow: 0 0 24px rgba(192, 132, 252, 0.12);
+}
+
+.pdf-report-meta {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #c4b5fd;
+}
+
+/* Prevent cards splitting across PDF pages */
+
+.pdf-export-surface .section-card,
+.pdf-export-surface .card,
+.pdf-export-surface .reasoning-box,
+.pdf-export-surface .reasoning-section,
+.pdf-export-surface .pipeline,
+.pdf-export-surface .table-wrap {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}

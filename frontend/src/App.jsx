@@ -15,10 +15,12 @@
 	
 	File: App.jsx
 	
-	Updated: March 14th, 2026, 9:58 PM CST
+	Updated: March 14th, 2026, 10:35 PM CST
 */
 
 import { useRef, useState } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import "./App.css";
 
 export default function App() {
@@ -70,24 +72,76 @@ export default function App() {
     }
   }
 
-  function exportToPdf() {
+  function buildPdfFileName() {
+    const safeDomain = String(result?.domain || "report")
+      .toLowerCase()
+      .replace(/[^a-z0-9.-]/g, "-")
+      .replace(/-+/g, "-");
+
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+
+    return `scutora-dmarc-report-${safeDomain}-${yyyy}${mm}${dd}-${hh}${min}.pdf`;
+  }
+
+  async function exportToPdf() {
     if (!result) {
       setError("Run an analysis before exporting a PDF.");
       return;
     }
 
-    const originalTitle = document.title;
-    const exportName = result?.domain
-      ? `Scutora Report - ${result.domain}`
-      : "Scutora Report";
+    if (!reportRef.current) {
+      setError("Unable to find the report content for export.");
+      return;
+    }
 
-    document.title = exportName;
+    setError("");
 
-    window.print();
+    try {
+      const exportRoot = reportRef.current;
 
-    setTimeout(() => {
-      document.title = originalTitle;
-    }, 300);
+      const canvas = await html2canvas(exportRoot, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        windowWidth: document.documentElement.scrollWidth,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const margin = 10;
+      const usableWidth = pageWidth - margin * 2;
+      const usableHeight = pageHeight - margin * 2;
+
+      const imgWidth = usableWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = margin;
+
+      pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight, undefined, "FAST");
+      heightLeft -= usableHeight;
+
+      while (heightLeft > 0) {
+        pdf.addPage();
+        position = margin - (imgHeight - heightLeft);
+        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight, undefined, "FAST");
+        heightLeft -= usableHeight;
+      }
+
+      pdf.save(buildPdfFileName());
+    } catch (err) {
+      setError(err?.message || "Failed to export PDF.");
+    }
   }
 
   function getRiskClass(riskLevel) {
@@ -177,7 +231,7 @@ export default function App() {
   return (
     <div className="page">
       <div className="container">
-        <div className="hero no-print">
+        <div className="hero no-pdf">
           <div className="hero-content">
             <div className="badge">Scutora</div>
             <h1>Email Authentication Governance Dashboard</h1>
@@ -222,22 +276,22 @@ export default function App() {
           </div>
         </div>
 
-        {result ? (
-          <div className="print-report-header print-only">
-            <div className="print-report-brand">Scutora</div>
-            <h1>Email Authentication Governance Report</h1>
-            <div className="print-report-meta">
-              <div>
-                <strong>Domain:</strong> {String(result.domain ?? "N/A")}
-              </div>
-              <div>
-                <strong>Generated:</strong> {new Date().toLocaleString()}
+        <div ref={reportRef} className="report-content pdf-export-surface">
+          {result ? (
+            <div className="pdf-report-header">
+              <div className="pdf-report-brand">Scutora</div>
+              <h1>Email Authentication Governance Report</h1>
+              <div className="pdf-report-meta">
+                <div>
+                  <strong>Domain:</strong> {String(result.domain ?? "N/A")}
+                </div>
+                <div>
+                  <strong>Generated:</strong> {new Date().toLocaleString()}
+                </div>
               </div>
             </div>
-          </div>
-        ) : null}
+          ) : null}
 
-        <div ref={reportRef} className="report-content">
           <div className="section-card">
             <div className="section-header">
               <h2>Agent Pipeline</h2>
@@ -265,10 +319,10 @@ export default function App() {
             </div>
           </div>
 
-          {error ? <div className="error-box no-print">{error}</div> : null}
+          {error ? <div className="error-box no-pdf">{error}</div> : null}
 
           {!result && !loading ? (
-            <div className="empty-state no-print">
+            <div className="empty-state no-pdf">
               Upload a DMARC XML report to generate telemetry findings, risk analysis,
               AI reasoning, and recommended governance actions.
             </div>
