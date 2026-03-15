@@ -33,3 +33,7 @@ Built with:
 Example DMARC aggregate reports are included in /sample-reports.
 
 These can be uploaded directly into the Scutora dashboard for testing.
+
+## License
+
+MIT License
