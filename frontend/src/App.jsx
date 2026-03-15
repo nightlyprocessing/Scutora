@@ -234,16 +234,32 @@ export default function App() {
         ) : null}
 
         <div ref={reportRef} className="report-content">
-          <div className="section-card">
-            <div className="section-header">
-              <h2>Agent Pipeline</h2>
-              <p>How Scutora analyzes and governs email authentication posture.</p>
-            </div>
-            <div className="section-body">
-              <div className="pipeline">
-                Discovery → Telemetry → Diagnostics → Governance → AI Reasoning → Action Plan
-              </div>
-            </div>
+			<div className="section-card">
+			  <div className="section-header">
+			  <h2>Agent Pipeline</h2>
+			  <p>How Scutora processes a DMARC report from intake through governance output.</p>
+			  </div>
+			<div className="section-body">
+			  <div className="pipeline-steps">
+				<div className="pipeline-step">Discovery</div>
+				<div className="pipeline-arrow">→</div>
+
+				<div className="pipeline-step">Telemetry</div>
+				<div className="pipeline-arrow">→</div>
+
+				<div className="pipeline-step">Diagnostics</div>
+				<div className="pipeline-arrow">→</div>
+
+				<div className="pipeline-step">Governance</div>
+				<div className="pipeline-arrow">→</div>
+
+				<div className="pipeline-step">AI Reasoning</div>
+				<div className="pipeline-arrow">→</div>
+
+      <div className="pipeline-step">Action Plan</div>
+    </div>
+  </div>
+</div>
           </div>
 
           {error ? <div className="error-box no-print">{error}</div> : null}
