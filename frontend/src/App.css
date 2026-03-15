@@ -1,14 +1,22 @@
 /*
-    Project: Scutora Security Platform
-    File: app.css
-    Repository: https://github.com/scutora
 
+    Scutora Security Platform
     Copyright (c) 2026 Joe Miglio. All rights reserved.
 
-    Proprietary and confidential source code.
-    Unauthorized copying or distribution is prohibited.
+    This source code is part of the Scutora project and contains
+    proprietary and confidential information belonging to Joe Miglio.
+
+    Unauthorized copying, modification, distribution, reverse engineering,
+    or disclosure of this file, in whole or in part, is strictly prohibited
+    without the prior written permission of the copyright holder.
+
+    This software may include trade secrets and proprietary techniques
+    related to domain intelligence, threat analysis, and AI-driven security
+    automation developed as part of the Scutora platform.
 	
-	Updated: March 14th, 2026, 7:41 PM CST
+	File: App.css
+	
+	Updated: March 14th, 2026, 9:58 PM CST
 */
 
 :root {
@@ -178,6 +186,14 @@ h1 {
   width: 100%;
   color: #d8b4fe;
   margin-bottom: 12px;
+}
+
+.selected-file-name {
+  margin: 4px 0 10px;
+  color: #c4b5fd;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-word;
 }
 
 .loading {
@@ -471,6 +487,26 @@ td {
   margin-top: 6px;
 }
 
+.secondary-button {
+  width: 100%;
+  margin-top: 12px;
+  border: 1px solid rgba(192, 132, 252, 0.3);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(24, 13, 52, 0.96), rgba(15, 9, 35, 0.98));
+  color: #f3e8ff;
+  padding: 12px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  transform: translateY(-1px);
+}
+
+.print-only {
+  display: none;
+}
+
 @media (max-width: 1100px) {
   .hero {
     grid-template-columns: 1fr;
@@ -493,5 +529,153 @@ td {
   .pill-grid,
   .pill-grid.wide {
     grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  :root {
+    color: #1f1534;
+    background: #ffffff;
+  }
+
+  html,
+  body,
+  .page {
+    background: #ffffff !important;
+    color: #1f1534 !important;
+  }
+
+  body {
+    min-height: auto;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+
+  .print-report-header {
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #d9c2ff;
+  }
+
+  .print-report-brand {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6d28d9;
+  }
+
+  .print-report-header h1 {
+    margin: 0 0 12px;
+    font-size: 28px;
+    line-height: 1.2;
+    color: #1f1534;
+    text-shadow: none;
+  }
+
+  .print-report-meta {
+    display: grid;
+    gap: 6px;
+    font-size: 13px;
+    color: #3b2b5e;
+  }
+
+  .report-content {
+    margin-top: 0;
+  }
+
+  .section-card,
+  .card,
+  .reasoning-box,
+  .reasoning-section,
+  .pipeline,
+  .table-wrap {
+    background: #ffffff !important;
+    color: #1f1534 !important;
+    border: 1px solid #d9c2ff !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .section-header {
+    border-bottom: 1px solid #d9c2ff;
+  }
+
+  .section-header h2,
+  .pill-value,
+  td,
+  th,
+  .action-step-title,
+  .reasoning-section-title,
+  .reasoning-section-body,
+  .action-step-description,
+  .technical-detail-card,
+  .pipeline {
+    color: #1f1534 !important;
+  }
+
+  .section-header p,
+  .pill-label,
+  .step-number,
+  .empty-inline,
+  .action-step-reason,
+  .print-report-meta {
+    color: #5a457e !important;
+  }
+
+  .classification-pill,
+  .badge {
+    color: #1f1534 !important;
+    border-color: #cdb3ff !important;
+    background: #f4edff !important;
+    box-shadow: none !important;
+  }
+
+  .pill-grid,
+  .pill-grid.wide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid,
+  .reasoning-sections,
+  .action-steps {
+    gap: 16px;
+  }
+
+  .section-card,
+  .card,
+  .reasoning-section,
+  .table-wrap {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+  th,
+  td {
+    padding: 8px 10px;
+    border-color: #e4d5ff !important;
+  }
+
+  @page {
+    size: auto;
+    margin: 0.5in;
   }
 }
