@@ -227,39 +227,42 @@ export default function App() {
             <div className="print-report-brand">Scutora</div>
             <h1>Email Authentication Governance Report</h1>
             <div className="print-report-meta">
-              <div><strong>Domain:</strong> {String(result.domain ?? "N/A")}</div>
-              <div><strong>Generated:</strong> {new Date().toLocaleString()}</div>
+              <div>
+                <strong>Domain:</strong> {String(result.domain ?? "N/A")}
+              </div>
+              <div>
+                <strong>Generated:</strong> {new Date().toLocaleString()}
+              </div>
             </div>
           </div>
         ) : null}
 
         <div ref={reportRef} className="report-content">
-			<div className="section-card">
-			  <div className="section-header">
-			  <h2>Agent Pipeline</h2>
-			  <p>How Scutora processes a DMARC report from intake through governance output.</p>
-			  </div>
-			<div className="section-body">
-			  <div className="pipeline-steps">
-				<div className="pipeline-step">Discovery</div>
-				<div className="pipeline-arrow">→</div>
+          <div className="section-card">
+            <div className="section-header">
+              <h2>Agent Pipeline</h2>
+              <p>How Scutora processes a DMARC report from intake through governance output.</p>
+            </div>
+            <div className="section-body">
+              <div className="pipeline-steps">
+                <div className="pipeline-step">Discovery</div>
+                <div className="pipeline-arrow">→</div>
 
-				<div className="pipeline-step">Telemetry</div>
-				<div className="pipeline-arrow">→</div>
+                <div className="pipeline-step">Telemetry</div>
+                <div className="pipeline-arrow">→</div>
 
-				<div className="pipeline-step">Diagnostics</div>
-				<div className="pipeline-arrow">→</div>
+                <div className="pipeline-step">Diagnostics</div>
+                <div className="pipeline-arrow">→</div>
 
-				<div className="pipeline-step">Governance</div>
-				<div className="pipeline-arrow">→</div>
+                <div className="pipeline-step">Governance</div>
+                <div className="pipeline-arrow">→</div>
 
-				<div className="pipeline-step">AI Reasoning</div>
-				<div className="pipeline-arrow">→</div>
+                <div className="pipeline-step">AI Reasoning</div>
+                <div className="pipeline-arrow">→</div>
 
-      <div className="pipeline-step">Action Plan</div>
-    </div>
-  </div>
-</div>
+                <div className="pipeline-step">Action Plan</div>
+              </div>
+            </div>
           </div>
 
           {error ? <div className="error-box no-print">{error}</div> : null}
@@ -477,13 +480,27 @@ export default function App() {
                           <div className="section-body">
                             {result.action_plan.proposed_actions.map((action, index) => (
                               <div key={index} className="card technical-detail-card">
-                                <div><strong>System:</strong> {action.system || "N/A"}</div>
-                                <div><strong>Action:</strong> {action.action || "N/A"}</div>
-                                <div><strong>Record Type:</strong> {action.record_type || "N/A"}</div>
-                                <div><strong>Record Name:</strong> {action.record_name || "N/A"}</div>
-                                <div><strong>Current Value:</strong> {action.current_value || "N/A"}</div>
-                                <div><strong>Proposed Value:</strong> {action.proposed_value || "N/A"}</div>
-                                <div><strong>Reason:</strong> {action.reason || "N/A"}</div>
+                                <div>
+                                  <strong>System:</strong> {action.system || "N/A"}
+                                </div>
+                                <div>
+                                  <strong>Action:</strong> {action.action || "N/A"}
+                                </div>
+                                <div>
+                                  <strong>Record Type:</strong> {action.record_type || "N/A"}
+                                </div>
+                                <div>
+                                  <strong>Record Name:</strong> {action.record_name || "N/A"}
+                                </div>
+                                <div>
+                                  <strong>Current Value:</strong> {action.current_value || "N/A"}
+                                </div>
+                                <div>
+                                  <strong>Proposed Value:</strong> {action.proposed_value || "N/A"}
+                                </div>
+                                <div>
+                                  <strong>Reason:</strong> {action.reason || "N/A"}
+                                </div>
                               </div>
                             ))}
                           </div>
