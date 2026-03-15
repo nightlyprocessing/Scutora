@@ -1,21 +1,9 @@
 /*
-    Scutora Security Platform
-    Copyright (c) 2026 Joe Miglio. All rights reserved.
+Scutora Security Platform
+Copyright (c) 2026 Joe Miglio
 
-    This source code is part of the Scutora project and contains
-    proprietary and confidential information belonging to Joe Miglio.
-
-    Unauthorized copying, modification, distribution, reverse engineering,
-    or disclosure of this file, in whole or in part, is strictly prohibited
-    without the prior written permission of the copyright holder.
-
-    This software may include trade secrets and proprietary techniques
-    related to domain intelligence, threat analysis, and AI-driven security
-    automation developed as part of the Scutora platform.
-	
-	File: App.jsx
-	
-	Updated: March 15th, 2026, 12:18 AM CST
+Licensed under the MIT License.
+See LICENSE file in the project root for full license information.
 */
 
 import { useRef, useState } from "react";

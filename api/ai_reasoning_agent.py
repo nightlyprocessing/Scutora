@@ -1,13 +1,8 @@
-# Scutora
-# Copyright (c) 2026 Joe Miglio. All rights reserved.
+# Scutora Security Platform
+# Copyright (c) 2026 Joe Miglio
 #
-# This source file is proprietary and confidential.
-# Unauthorized copying, modification, distribution, disclosure,
-# or use of this file, in whole or in part, is strictly prohibited
-# without the prior written permission of Joe Miglio.
-#
-# This file may contain trade secrets, confidential information,
-# and other proprietary material related to the Scutora project.
+# Licensed under the MIT License.
+# See the LICENSE file in the project root for license information.
 
 import os
 from openai import AzureOpenAI
