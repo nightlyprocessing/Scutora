@@ -15,7 +15,7 @@
 	
 	File: App.jsx
 	
-	Updated: March 14th, 2026, 10:35 PM CST
+	Updated: March 15th, 2026, 12:18 AM CST
 */
 
 import { useRef, useState } from "react";
@@ -88,6 +88,14 @@ export default function App() {
     return `scutora-dmarc-report-${safeDomain}-${yyyy}${mm}${dd}-${hh}${min}.pdf`;
   }
 
+  function waitForRender() {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
+  }
+
   async function exportToPdf() {
     if (!result) {
       setError("Run an analysis before exporting a PDF.");
@@ -103,39 +111,150 @@ export default function App() {
 
     try {
       const exportRoot = reportRef.current;
-
-      const canvas = await html2canvas(exportRoot, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        windowWidth: document.documentElement.scrollWidth,
-      });
-
-      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
 
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-
       const margin = 10;
       const usableWidth = pageWidth - margin * 2;
       const usableHeight = pageHeight - margin * 2;
 
-      const imgWidth = usableWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let currentY = margin;
+      let isFirstPage = true;
 
-      let heightLeft = imgHeight;
-      let position = margin;
+      const sectionNodes = Array.from(
+        exportRoot.querySelectorAll("[data-pdf-section='true']")
+      );
 
-      pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight, undefined, "FAST");
-      heightLeft -= usableHeight;
+      async function renderNodeToCanvas(node) {
+        await waitForRender();
 
-      while (heightLeft > 0) {
-        pdf.addPage();
-        position = margin - (imgHeight - heightLeft);
-        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight, undefined, "FAST");
-        heightLeft -= usableHeight;
+        return html2canvas(node, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          logging: false,
+          windowWidth: document.documentElement.scrollWidth,
+        });
+      }
+
+      async function addCanvasToPdf(canvas) {
+        const imgWidthMm = usableWidth;
+        const imgHeightMm = (canvas.height * imgWidthMm) / canvas.width;
+        const remainingSpaceMm = usableHeight - (currentY - margin);
+
+        if (imgHeightMm <= remainingSpaceMm) {
+          const imgData = canvas.toDataURL("image/png");
+          pdf.addImage(
+            imgData,
+            "PNG",
+            margin,
+            currentY,
+            imgWidthMm,
+            imgHeightMm,
+            undefined,
+            "FAST"
+          );
+          currentY += imgHeightMm + 6;
+          return;
+        }
+
+        if (imgHeightMm <= usableHeight) {
+          if (!isFirstPage) {
+            pdf.addPage();
+          }
+          isFirstPage = false;
+          currentY = margin;
+
+          const imgData = canvas.toDataURL("image/png");
+          pdf.addImage(
+            imgData,
+            "PNG",
+            margin,
+            currentY,
+            imgWidthMm,
+            imgHeightMm,
+            undefined,
+            "FAST"
+          );
+          currentY += imgHeightMm + 6;
+          return;
+        }
+
+        const pxPerMm = canvas.width / imgWidthMm;
+        const sliceHeightPx = Math.floor(usableHeight * pxPerMm);
+
+        let renderedHeightPx = 0;
+        let firstSlice = true;
+
+        while (renderedHeightPx < canvas.height) {
+          const remainingPx = canvas.height - renderedHeightPx;
+          const currentSliceHeightPx = Math.min(sliceHeightPx, remainingPx);
+
+          const sliceCanvas = document.createElement("canvas");
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = currentSliceHeightPx;
+
+          const sliceContext = sliceCanvas.getContext("2d");
+          if (!sliceContext) {
+            throw new Error("Unable to prepare PDF canvas slice.");
+          }
+
+          sliceContext.drawImage(
+            canvas,
+            0,
+            renderedHeightPx,
+            canvas.width,
+            currentSliceHeightPx,
+            0,
+            0,
+            canvas.width,
+            currentSliceHeightPx
+          );
+
+          const sliceImgData = sliceCanvas.toDataURL("image/png");
+          const sliceHeightMm = currentSliceHeightPx / pxPerMm;
+
+          if (firstSlice) {
+            if (!isFirstPage && currentY !== margin) {
+              pdf.addPage();
+            }
+            currentY = margin;
+          } else {
+            pdf.addPage();
+            currentY = margin;
+          }
+
+          isFirstPage = false;
+
+          pdf.addImage(
+            sliceImgData,
+            "PNG",
+            margin,
+            currentY,
+            imgWidthMm,
+            sliceHeightMm,
+            undefined,
+            "FAST"
+          );
+
+          renderedHeightPx += currentSliceHeightPx;
+          firstSlice = false;
+        }
+
+        currentY += 6;
+      }
+
+      const headerNode = exportRoot.querySelector(".pdf-report-header");
+      if (headerNode) {
+        const headerCanvas = await renderNodeToCanvas(headerNode);
+        await addCanvasToPdf(headerCanvas);
+        isFirstPage = false;
+      }
+
+      for (const sectionNode of sectionNodes) {
+        const sectionCanvas = await renderNodeToCanvas(sectionNode);
+        await addCanvasToPdf(sectionCanvas);
       }
 
       pdf.save(buildPdfFileName());
@@ -292,7 +411,7 @@ export default function App() {
             </div>
           ) : null}
 
-          <div className="section-card">
+          <div className="section-card" data-pdf-section="true">
             <div className="section-header">
               <h2>Agent Pipeline</h2>
               <p>How Scutora processes a DMARC report from intake through governance output.</p>
@@ -330,7 +449,7 @@ export default function App() {
 
           {result ? (
             <div className="grid">
-              <div className="section-card">
+              <div className="section-card" data-pdf-section="true">
                 <div className="section-header">
                   <h2>Executive Summary</h2>
                   <p>Top-level outcome from the current analysis.</p>
@@ -366,7 +485,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="section-card">
+              <div className="section-card" data-pdf-section="true">
                 <div className="section-header">
                   <h2>Telemetry Summary</h2>
                   <p>Aggregated DMARC telemetry metrics.</p>
@@ -419,7 +538,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="section-card">
+              <div className="section-card" data-pdf-section="true">
                 <div className="section-header">
                   <h2>Classified Findings</h2>
                   <p>Diagnostics agent classifications for failing sender patterns.</p>
@@ -466,7 +585,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="section-card">
+              <div className="section-card" data-pdf-section="true">
                 <div className="section-header">
                   <h2>AI Reasoning</h2>
                   <p>Model-generated explanation of the recommendation.</p>
@@ -491,7 +610,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="section-card">
+              <div className="section-card" data-pdf-section="true">
                 <div className="section-header">
                   <h2>Action Plan</h2>
                   <p>Concrete next steps based on the current findings.</p>

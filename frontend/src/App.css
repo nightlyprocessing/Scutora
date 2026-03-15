@@ -775,3 +775,13 @@ td {
   break-inside: avoid;
   page-break-inside: avoid;
 }
+
+.pdf-export-surface {
+  background: #ffffff;
+  padding: 0;
+}
+
+.pdf-export-surface .section-card,
+.pdf-export-surface .pdf-report-header {
+  overflow: hidden;
+}
