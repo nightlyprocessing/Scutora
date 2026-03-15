@@ -27,3 +27,9 @@ Built with:
 - Azure
 - Microsoft Agent Framework
 - GitHub
+
+## Sample Reports
+
+Example DMARC aggregate reports are included in /sample-reports.
+
+These can be uploaded directly into the Scutora dashboard for testing.
