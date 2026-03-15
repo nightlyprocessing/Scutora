@@ -302,13 +302,17 @@ h1 {
 }
 
 .risk-low {
-  border-color: rgba(167, 139, 250, 0.28);
-  background: linear-gradient(180deg, rgba(43, 28, 95, 0.6) 0%, rgba(28, 18, 72, 0.66) 100%);
+  border-color: rgba(52, 211, 153, 0.38);
+  background: linear-gradient(
+    180deg,
+    rgba(11, 58, 42, 0.72) 0%,
+    rgba(9, 46, 34, 0.78) 100%
+  );
 }
 
 .risk-low .pill-label,
 .risk-low .pill-value {
-  color: #ddd6fe;
+  color: #a7f3d0;
 }
 
 .risk-unknown {
