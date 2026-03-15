@@ -1,3 +1,16 @@
+/*
+    Project: Scutora Security Platform
+    File: app.css
+    Repository: https://github.com/scutora
+
+    Copyright (c) 2026 Joe Miglio. All rights reserved.
+
+    Proprietary and confidential source code.
+    Unauthorized copying or distribution is prohibited.
+	
+	Updated: March 14th, 2026, 7:41 PM CST
+*/
+
 :root {
   font-family: Inter, system-ui, Arial, sans-serif;
   color: #f3e8ff;
@@ -85,8 +98,7 @@ h1 {
 .empty-state,
 .error-box {
   border: 1px solid rgba(192, 132, 252, 0.2);
-  background:
-    linear-gradient(180deg, rgba(18, 10, 42, 0.94) 0%, rgba(12, 8, 30, 0.96) 100%);
+  background: linear-gradient(180deg, rgba(18, 10, 42, 0.94) 0%, rgba(12, 8, 30, 0.96) 100%);
   border-radius: 18px;
   box-shadow:
     0 18px 44px rgba(0, 0, 0, 0.34),
@@ -131,8 +143,7 @@ h1 {
   margin-top: 14px;
   border: 1px solid rgba(216, 180, 254, 0.32);
   border-radius: 12px;
-  background:
-    linear-gradient(135deg, #6d28d9 0%, #8b5cf6 45%, #c084fc 100%);
+  background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 45%, #c084fc 100%);
   color: #faf5ff;
   padding: 12px 14px;
   font-size: 15px;
@@ -180,8 +191,7 @@ h1 {
   padding: 16px 18px;
   margin: 20px 0;
   color: #ffd2f0;
-  background:
-    linear-gradient(180deg, rgba(92, 18, 53, 0.55) 0%, rgba(68, 12, 44, 0.6) 100%);
+  background: linear-gradient(180deg, rgba(92, 18, 53, 0.55) 0%, rgba(68, 12, 44, 0.6) 100%);
   border-color: rgba(244, 114, 182, 0.26);
 }
 
@@ -223,8 +233,7 @@ h1 {
 .pipeline {
   padding: 16px;
   border-radius: 12px;
-  background:
-    linear-gradient(180deg, rgba(6, 3, 20, 0.9) 0%, rgba(9, 4, 28, 0.92) 100%);
+  background: linear-gradient(180deg, rgba(6, 3, 20, 0.9) 0%, rgba(9, 4, 28, 0.92) 100%);
   border: 1px solid rgba(192, 132, 252, 0.14);
   color: #f3e8ff;
   font-weight: 600;
@@ -244,8 +253,7 @@ h1 {
 
 .card {
   border: 1px solid rgba(192, 132, 252, 0.14);
-  background:
-    linear-gradient(180deg, rgba(8, 4, 22, 0.92) 0%, rgba(12, 7, 28, 0.92) 100%);
+  background: linear-gradient(180deg, rgba(8, 4, 22, 0.92) 0%, rgba(12, 7, 28, 0.92) 100%);
   border-radius: 14px;
   padding: 12px 14px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
@@ -268,8 +276,7 @@ h1 {
 
 .risk-high {
   border-color: rgba(244, 114, 182, 0.32);
-  background:
-    linear-gradient(180deg, rgba(74, 15, 42, 0.72) 0%, rgba(55, 10, 33, 0.74) 100%);
+  background: linear-gradient(180deg, rgba(74, 15, 42, 0.72) 0%, rgba(55, 10, 33, 0.74) 100%);
 }
 
 .risk-high .pill-label,
@@ -279,8 +286,7 @@ h1 {
 
 .risk-medium {
   border-color: rgba(216, 180, 254, 0.3);
-  background:
-    linear-gradient(180deg, rgba(74, 33, 104, 0.62) 0%, rgba(58, 22, 89, 0.66) 100%);
+  background: linear-gradient(180deg, rgba(74, 33, 104, 0.62) 0%, rgba(58, 22, 89, 0.66) 100%);
 }
 
 .risk-medium .pill-label,
@@ -290,8 +296,7 @@ h1 {
 
 .risk-low {
   border-color: rgba(167, 139, 250, 0.28);
-  background:
-    linear-gradient(180deg, rgba(43, 28, 95, 0.6) 0%, rgba(28, 18, 72, 0.66) 100%);
+  background: linear-gradient(180deg, rgba(43, 28, 95, 0.6) 0%, rgba(28, 18, 72, 0.66) 100%);
 }
 
 .risk-low .pill-label,
@@ -301,8 +306,7 @@ h1 {
 
 .risk-unknown {
   border-color: rgba(147, 51, 234, 0.2);
-  background:
-    linear-gradient(180deg, rgba(39, 18, 76, 0.54) 0%, rgba(26, 12, 58, 0.62) 100%);
+  background: linear-gradient(180deg, rgba(39, 18, 76, 0.54) 0%, rgba(26, 12, 58, 0.62) 100%);
 }
 
 .table-wrap {
@@ -375,9 +379,9 @@ td {
 }
 
 .reasoning-box,
-.code-block {
-  background:
-    linear-gradient(180deg, rgba(7, 4, 20, 0.88) 0%, rgba(11, 6, 26, 0.92) 100%);
+.code-block,
+.reasoning-section {
+  background: linear-gradient(180deg, rgba(7, 4, 20, 0.88) 0%, rgba(11, 6, 26, 0.92) 100%);
   border: 1px solid rgba(192, 132, 252, 0.14);
   border-radius: 14px;
   padding: 14px;
@@ -387,6 +391,23 @@ td {
   white-space: pre-wrap;
   line-height: 1.8;
   color: #f3e8ff;
+}
+
+.reasoning-sections {
+  display: grid;
+  gap: 16px;
+}
+
+.reasoning-section-title {
+  font-weight: 800;
+  color: #f5e8ff;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.reasoning-section-body {
+  color: #f3e8ff;
+  line-height: 1.8;
 }
 
 .code-block {
@@ -402,6 +423,10 @@ td {
 .action-steps {
   display: grid;
   gap: 14px;
+}
+
+.action-meta-card {
+  margin-bottom: 1rem;
 }
 
 .action-step-card {
