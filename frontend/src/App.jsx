@@ -12,6 +12,10 @@
     This software may include trade secrets and proprietary techniques
     related to domain intelligence, threat analysis, and AI-driven security
     automation developed as part of the Scutora platform.
+	
+	File: app.jsx
+	
+	Updated: March 14th, 2026, 7:41 PM CST
 */
 
 import { useState } from "react";
@@ -49,7 +53,7 @@ export default function App() {
             errorMessage = errorData.error;
           }
         } catch {
-          // Ignore JSON parsing issues and use generic message.
+          // Ignore JSON parsing issues and fall back to generic message.
         }
 
         throw new Error(errorMessage);
@@ -114,9 +118,40 @@ export default function App() {
     return fallbackSteps;
   }
 
+  function formatReasoningSections(text) {
+    if (!text) return [];
+
+    return text
+      .split(/\n\s*\n/)
+      .map((block) => block.trim())
+      .filter(Boolean)
+      .map((block) => {
+        const lines = block
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean);
+
+        const firstLine = lines[0] || "";
+        const body = lines.slice(1).join(" ").trim();
+
+        const cleanedTitle = firstLine
+          .replace(/^#+\s*/, "")
+          .replace(/^\d+[\.\)]\s*/, "")
+          .trim();
+
+        return {
+          title: cleanedTitle,
+          body,
+        };
+      });
+  }
+
   const riskClass = getRiskClass(result?.decision?.risk_level);
   const classifiedFindings = result?.diagnostics?.classified_findings || [];
   const actionSteps = buildActionSteps(result?.action_plan);
+  const reasoningSections = formatReasoningSections(
+    result?.reasoning?.reasoning_summary
+  );
 
   return (
     <div className="page">
@@ -315,9 +350,22 @@ export default function App() {
                 <p>Model-generated explanation of the recommendation.</p>
               </div>
               <div className="section-body">
-                <div className="reasoning-box">
-                  {result.reasoning?.reasoning_summary || "No reasoning available."}
-                </div>
+                {reasoningSections.length > 0 ? (
+                  <div className="reasoning-sections">
+                    {reasoningSections.map((section, index) => (
+                      <div key={index} className="reasoning-section">
+                        <div className="reasoning-section-title">{section.title}</div>
+                        <div className="reasoning-section-body">
+                          {section.body || "No details provided."}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="reasoning-box">
+                    {result.reasoning?.reasoning_summary || "No reasoning available."}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -331,7 +379,7 @@ export default function App() {
                   <div className="empty-inline">No action plan available.</div>
                 ) : (
                   <>
-                    <div className="card" style={{ marginBottom: "1rem" }}>
+                    <div className="card action-meta-card">
                       <div className="pill-label">Approval Required</div>
                       <div className="pill-value">
                         {String(result.action_plan?.approval_required ?? "N/A")}
