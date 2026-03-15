@@ -115,9 +115,16 @@ export default function App() {
 
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10;
+      const margin = 8;
       const usableWidth = pageWidth - margin * 2;
       const usableHeight = pageHeight - margin * 2;
+
+      function paintPdfPageBackground() {
+        pdf.setFillColor(10, 6, 28);
+        pdf.rect(0, 0, pageWidth, pageHeight, "F");
+      }
+
+      paintPdfPageBackground();
 
       let currentY = margin;
       let isFirstPage = true;
@@ -155,13 +162,14 @@ export default function App() {
             undefined,
             "FAST"
           );
-          currentY += imgHeightMm + 6;
+          currentY += imgHeightMm + 2;
           return;
         }
 
         if (imgHeightMm <= usableHeight) {
           if (!isFirstPage) {
             pdf.addPage();
+            paintPdfPageBackground();
           }
           isFirstPage = false;
           currentY = margin;
@@ -177,7 +185,7 @@ export default function App() {
             undefined,
             "FAST"
           );
-          currentY += imgHeightMm + 6;
+          currentY += imgHeightMm + 2;
           return;
         }
 
@@ -218,10 +226,12 @@ export default function App() {
           if (firstSlice) {
             if (!isFirstPage && currentY !== margin) {
               pdf.addPage();
+              paintPdfPageBackground();
             }
             currentY = margin;
           } else {
             pdf.addPage();
+            paintPdfPageBackground();
             currentY = margin;
           }
 
@@ -242,7 +252,7 @@ export default function App() {
           firstSlice = false;
         }
 
-        currentY += 6;
+        currentY += 2;
       }
 
       const headerNode = exportRoot.querySelector(".pdf-report-header");
