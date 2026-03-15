@@ -796,3 +796,31 @@ td {
 .pdf-mode .pdf-report-header {
   overflow: hidden;
 }
+
+.hero-cta {
+  margin-top: 28px;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  color: white;
+
+  background: linear-gradient(
+    135deg,
+    #7b3fe4 0%,
+    #9f6bff 100%
+  );
+
+  box-shadow: 0 8px 24px rgba(123, 63, 228, 0.35);
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(123, 63, 228, 0.45);
+}
