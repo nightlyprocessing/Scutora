@@ -777,11 +777,31 @@ td {
 }
 
 .pdf-export-surface {
-  background: #ffffff;
+  background: transparent;
   padding: 0;
 }
 
 .pdf-export-surface .section-card,
 .pdf-export-surface .pdf-report-header {
+  overflow: hidden;
+}
+
+/* Export mode tweaks applied when html2canvas clones the DOM */
+
+.pdf-mode .pdf-export-surface {
+  background: transparent !important;
+}
+
+.pdf-mode .section-card,
+.pdf-mode .pdf-report-header,
+.pdf-mode .card,
+.pdf-mode .reasoning-box,
+.pdf-mode .reasoning-section,
+.pdf-mode .table-wrap {
+  box-shadow: none !important;
+}
+
+.pdf-mode .section-card,
+.pdf-mode .pdf-report-header {
   overflow: hidden;
 }

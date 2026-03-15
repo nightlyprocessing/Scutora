@@ -133,17 +133,20 @@ export default function App() {
         exportRoot.querySelectorAll("[data-pdf-section='true']")
       );
 
-      async function renderNodeToCanvas(node) {
-        await waitForRender();
+		async function renderNodeToCanvas(node) {
+		await waitForRender();
 
-        return html2canvas(node, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          logging: false,
-          windowWidth: document.documentElement.scrollWidth,
-        });
-      }
+		return html2canvas(node, {
+		scale: 2,
+		useCORS: true,
+		backgroundColor: null,
+		logging: false,
+		windowWidth: document.documentElement.scrollWidth,
+		onclone: (clonedDoc) => {
+			clonedDoc.body.classList.add("pdf-mode");
+			},
+		});
+	}
 
       async function addCanvasToPdf(canvas) {
         const imgWidthMm = usableWidth;
