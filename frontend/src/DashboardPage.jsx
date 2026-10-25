@@ -13,6 +13,7 @@ import "./App.css";
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
+  const [apiKey, setApiKey] = useState(() => sessionStorage.getItem("scutoraApiKey") || "");
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -26,12 +27,18 @@ export default function DashboardPage() {
       return;
     }
 
+    if (!apiKey) {
+      setError("Enter your Scutora API key before analyzing a report.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     try {
       const response = await fetch(uploadEndpoint, {
         method: "POST",
+        headers: { "X-Scutora-Api-Key": apiKey },
         body: selectedFile,
       });
 
@@ -364,7 +371,21 @@ export default function DashboardPage() {
 
           <div className="control-card">
             <div className="upload-block">
-              <label htmlFor="xmlfile">DMARC XML Upload</label>
+              <label htmlFor="scutora-api-key">Scutora API Key</label>
+              <input
+                id="scutora-api-key"
+                type="password"
+                autoComplete="current-password"
+                value={apiKey}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setApiKey(value);
+                  sessionStorage.setItem("scutoraApiKey", value);
+                }}
+                placeholder="Enter the API key configured for your deployment"
+              />
+
+              <label htmlFor="xmlfile">DMARC XML Upload (max 1 MiB)</label>
               <input
                 id="xmlfile"
                 type="file"
