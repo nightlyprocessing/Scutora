@@ -3,4 +3,5 @@
 # azure-monitor-opentelemetry
 
 azure-functions
+defusedxml>=0.7.1,<0.8
 openai

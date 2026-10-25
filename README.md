@@ -41,3 +41,27 @@ These can be uploaded directly into the Scutora dashboard for testing.
 ## License
 
 MIT License
+
+
+## Private API configuration
+
+The API rejects requests unless the Azure Functions application setting
+`SCUTORA_API_KEY` is configured. Generate a unique high-entropy value, add it
+as an application setting in the Function App configuration, and enter the same
+value in the dashboard's API Key field. The dashboard keeps it only in the
+current browser tab's session storage and sends it in the
+`X-Scutora-Api-Key` request header. Do not commit the key or place it in
+frontend build settings.
+
+For example, generate a 256-bit key with:
+
+```sh
+openssl rand -hex 32
+```
+
+Keep the Function App and Static Web App on HTTPS. If the API key is missing,
+the API fails closed. Set the Function App application setting `FUNCTIONS_REQUEST_BODY_SIZE_LIMIT`
+to `1048576` as well. This rejects oversized requests before the Python
+function materializes their bodies. XML uploads are also limited to 1 MiB in
+application code, parsed with `defusedxml`, and are not written to temporary
+files.

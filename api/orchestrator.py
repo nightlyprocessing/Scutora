@@ -17,7 +17,7 @@ from action_planning_agent import build_action_plan
 
 
 def run_scutora_analysis(
-    xml_file: str,
+    xml_file,
     domain: str = "scutora.com",
     use_mock_m365: bool = True,
     use_mock_gandi: bool = True
@@ -25,16 +25,18 @@ def run_scutora_analysis(
     """
     Run the Scutora end-to-end analysis pipeline.
 
-    Important:
-    - This function uses the XML file path explicitly passed in.
-    - It does NOT fall back to sample_dmarc.xml during normal execution.
+    The XML input may be a local path or an uploaded byte string. Uploaded
+    reports are parsed directly and are never written to temporary storage.
     """
-
     if not xml_file:
-        raise ValueError("xml_file was not provided to run_scutora_analysis().")
+        raise ValueError("An XML report was not provided.")
 
-    if not os.path.exists(xml_file):
-        raise FileNotFoundError(f"XML file not found: {xml_file}")
+    if isinstance(xml_file, bytes):
+        telemetry_xml_source = "uploaded report"
+    else:
+        if not os.path.exists(xml_file):
+            raise FileNotFoundError("XML report not found.")
+        telemetry_xml_source = xml_file
 
     gandi_api_token = os.getenv("GANDI_API_TOKEN")
 
@@ -72,7 +74,7 @@ def run_scutora_analysis(
     return {
         "domain": effective_domain,
         "telemetry_source": {
-            "xml_file": xml_file,
+            "xml_file": telemetry_xml_source,
             "report_domain": extracted_domain
         },
         "m365_posture": m365_posture,

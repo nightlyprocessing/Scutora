@@ -4,7 +4,7 @@
 # Licensed under the MIT License.
 # See the LICENSE file in the project root for license information.
 
-import xml.etree.ElementTree as ET
+from defusedxml import ElementTree as ET
 
 
 def extract_domain_from_report(root):
@@ -15,7 +15,6 @@ def extract_domain_from_report(root):
     1. policy_published/domain
     2. identifiers/header_from (first record)
     """
-
     policy_domain = root.findtext(".//policy_published/domain")
     if policy_domain:
         return policy_domain.strip()
@@ -27,16 +26,27 @@ def extract_domain_from_report(root):
     return None
 
 
-def parse_dmarc_report(xml_file):
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
+def parse_dmarc_report(xml_source):
+    """Parse a bounded XML byte string or a local XML file path."""
+    if isinstance(xml_source, bytes):
+        root = ET.fromstring(xml_source)
+    else:
+        tree = ET.parse(xml_source)
+        root = tree.getroot()
 
     report_domain = extract_domain_from_report(root)
     results = []
 
     for record in root.findall(".//record"):
         source_ip = record.findtext("row/source_ip")
-        count = int(record.findtext("row/count", "0"))
+        raw_count = record.findtext("row/count", "0")
+        try:
+            count = int(raw_count)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("DMARC report contains an invalid message count.") from exc
+        if count < 0:
+            raise ValueError("DMARC report contains a negative message count.")
+
         dkim = record.findtext("row/policy_evaluated/dkim")
         spf = record.findtext("row/policy_evaluated/spf")
 
