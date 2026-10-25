@@ -60,5 +60,8 @@ openssl rand -hex 32
 ```
 
 Keep the Function App and Static Web App on HTTPS. If the API key is missing,
-the API fails closed. XML uploads are limited to 1 MiB, parsed with
-`defusedxml`, and are not written to temporary files.
+the API fails closed. Set the Function App application setting `FUNCTIONS_REQUEST_BODY_SIZE_LIMIT`
+to `1048576` as well. This rejects oversized requests before the Python
+function materializes their bodies. XML uploads are also limited to 1 MiB in
+application code, parsed with `defusedxml`, and are not written to temporary
+files.
