@@ -5,6 +5,7 @@
 # See the LICENSE file in the project root for license information.
 
 import json
+import os
 import re
 import subprocess
 from typing import Any, Dict
@@ -65,7 +66,7 @@ def discover_m365_posture(domain: str, use_mock: bool = True) -> Dict[str, Any]:
             text=True,
             check=False,
             timeout=30,
-            env={**__import__("os").environ, "SCUTORA_M365_DOMAIN": domain}
+            env={**os.environ, "SCUTORA_M365_DOMAIN": domain}
         )
 
         stdout = result.stdout.strip()
